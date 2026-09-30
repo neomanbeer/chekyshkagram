@@ -148,6 +148,7 @@ public extension ChekushkagramSettings {
             ghost.fakeOffline = newValue.ghostModeEnabled && newValue.fakeOffline
             ghost.hideTyping = newValue.ghostModeEnabled && newValue.hideTyping
             ghost.ghostRead = newValue.ghostModeEnabled && newValue.ghostRead
+            ghost.unlimitedViewOnce = newValue.viewOnceBypassEnabled
         }
     }
 }

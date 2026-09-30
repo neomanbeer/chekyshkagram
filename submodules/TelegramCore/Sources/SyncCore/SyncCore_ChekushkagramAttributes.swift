@@ -9,6 +9,7 @@ public final class ChekushkagramGhostState {
     private var _fakeOffline: Bool = true
     private var _hideTyping: Bool = true
     private var _ghostRead: Bool = true
+    private var _unlimitedViewOnce: Bool = true
     
     public var anonymousStories: Bool {
         get { lock.lock(); defer { lock.unlock() }; return _anonymousStories }
@@ -28,6 +29,11 @@ public final class ChekushkagramGhostState {
     public var ghostRead: Bool {
         get { lock.lock(); defer { lock.unlock() }; return _ghostRead }
         set { lock.lock(); defer { lock.unlock() }; _ghostRead = newValue }
+    }
+    
+    public var unlimitedViewOnce: Bool {
+        get { lock.lock(); defer { lock.unlock() }; return _unlimitedViewOnce }
+        set { lock.lock(); defer { lock.unlock() }; _unlimitedViewOnce = newValue }
     }
 }
 
