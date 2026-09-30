@@ -44,6 +44,7 @@ jobs:
           mkdir -p artifacts
           # Patch rules_apple to allow building device IPA without requiring a provisioning profile
           python3 -c "p = 'build-system/bazel-rules/rules_apple/apple/internal/partials/provisioning_profile.bzl'; c = open(p).read(); open(p, 'w').write(c.replace('if not profile_artifact:\n        fail(', 'if not profile_artifact:\n        return struct()\n        fail('))"
+          python3 -c "p = 'build-system/bazel-rules/rules_apple/apple/internal/codesigning_support.bzl'; c = open(p).read(); open(p, 'w').write(c.replace('rule_descriptor.requires_signing_for_device and\n        not provisioning_profile):\n        fail(', 'rule_descriptor.requires_signing_for_device and\n        not provisioning_profile):\n        return\n        fail('))"
 
       - name: Build Chekushkagram IPA
         run: |
