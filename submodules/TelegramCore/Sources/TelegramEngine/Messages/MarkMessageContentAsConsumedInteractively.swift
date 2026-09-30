@@ -51,10 +51,15 @@ func _internal_markMessageContentAsConsumedInteractively(postbox: Postbox, messa
             let timestamp = Int32(CFAbsoluteTimeGetCurrent() + NSTimeIntervalSince1970)
             for i in 0 ..< updatedAttributes.count {
                 if let attribute = updatedAttributes[i] as? AutoremoveTimeoutMessageAttribute {
-                    // Chekushkagram: Keep view-once media forever without countdown
                     if attribute.countdownBeginTime == nil || attribute.countdownBeginTime == 0 {
-                        // Keep countdownBeginTime nil so media is never auto-removed
-                    }
+                        var timeout = attribute.timeout
+                        if let duration = message.secretMediaDuration {
+                            timeout = max(timeout, Int32(duration))
+                        }
+                        if !ChekushkagramGhostState.shared.unlimitedViewOnce {
+                            updatedAttributes[i] = AutoremoveTimeoutMessageAttribute(timeout: timeout, countdownBeginTime: timestamp)
+                            updateMessage = true
+                        }
                         
                         if messageId.peerId.namespace == Namespaces.Peer.SecretChat {
                             var layer: SecretChatLayer?
