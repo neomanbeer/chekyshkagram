@@ -46,6 +46,8 @@ jobs:
       - name: Build Chekushkagram IPA
         run: |
           python3 build-system/Make/Make.py \
+            --overrideXcodeVersion \
+            --overrideBazelVersion \
             build \
             --configurationPath=build-system/template_minimal_development_configuration.json \
             --codesigningInformationPath=build-system/fake-codesigning \
