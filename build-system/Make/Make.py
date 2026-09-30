@@ -701,6 +701,11 @@ def build(bazel, arguments):
 
     bazel_command_line.set_split_swiftmodules(arguments.enableParallelSwiftmoduleGeneration)
 
+    if arguments.disableProvisioningProfiles:
+        bazel_command_line.set_disable_provisioning_profiles()
+    if arguments.disableExtensions:
+        bazel_command_line.add_additional_args(['--//Telegram:disableExtensions'])
+
     bazel_command_line.invoke_build()
 
     if arguments.outputBuildArtifactsPath is not None:
@@ -1073,6 +1078,18 @@ if __name__ == '__main__':
         action='store_true',
         default=False,
         help='Continue build process after an error.',
+    )
+    buildParser.add_argument(
+        '--disableProvisioningProfiles',
+        action='store_true',
+        default=False,
+        help='Disable provisioning profiles requirement.',
+    )
+    buildParser.add_argument(
+        '--disableExtensions',
+        action='store_true',
+        default=False,
+        help='Disable extensions.',
     )
     buildParser.add_argument(
         '--showActions',
