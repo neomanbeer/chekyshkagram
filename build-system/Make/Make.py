@@ -271,6 +271,9 @@ class BazelCommandLine:
                 '--features=swift.split_derived_files_generation',
             ]
 
+        if self.additional_args is not None:
+            combined_arguments += self.additional_args
+
         return combined_arguments
 
     def invoke_build(self):
