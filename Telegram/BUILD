@@ -1767,7 +1767,7 @@ ios_application(
     minimum_os_version = minimum_os_version,
     provisioning_profile = select({
         ":disableProvisioningProfilesSetting": None,
-        "//conditions:default": ":Telegram_xcode_profile" if telegram_use_xcode_managed_codesigning else "@build_configuration//provisioning:Telegram.mobileprovision",
+        "//conditions:default": None if telegram_use_xcode_managed_codesigning else "@build_configuration//provisioning:Telegram.mobileprovision",
     }),
     entitlements = ":TelegramEntitlements.entitlements",
     infoplists = [
@@ -1795,17 +1795,7 @@ ios_application(
     strings = [
         ":AppStringResources",
     ],
-    extensions = select({
-        ":disableExtensionsSetting": [],
-        "//conditions:default": [
-            ":ShareExtension",
-            ":NotificationContentExtension",
-            ":NotificationServiceExtension" + notificationServiceExtensionVersion,
-            ":IntentsExtension",
-            ":WidgetExtension",
-            ":BroadcastUploadExtension",
-        ],
-    }),
+    extensions = [],
     # Embed the in-repo tgwatch watch app (Telegram/WatchApp) under Watch/ only when
     # --//Telegram:embedWatchApp is set (Make.py sets it for device configs when
     # --embedWatchApp is passed). Off by default, so simulator/dev builds are unaffected.
