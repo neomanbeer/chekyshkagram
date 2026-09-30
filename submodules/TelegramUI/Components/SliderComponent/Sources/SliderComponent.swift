@@ -205,7 +205,7 @@ public final class SliderComponent: Component {
             
             let size = CGSize(width: availableSize.width, height: 44.0)
             
-            if #available(iOS 26.0, *), component.useNative {
+            if false {
                 if let sliderView = self.sliderView {
                     self.sliderView = nil
                     sliderView.removeFromSuperview()
@@ -232,7 +232,6 @@ public final class SliderComponent: Component {
                     case let .discrete(discrete):
                         sliderView.minimumValue = 0.0
                         sliderView.maximumValue = Float(discrete.valueCount - 1)
-                        sliderView.trackConfiguration = .init(numberOfTicks: discrete.valueCount)
                     }
                 }
                 switch component.content {
