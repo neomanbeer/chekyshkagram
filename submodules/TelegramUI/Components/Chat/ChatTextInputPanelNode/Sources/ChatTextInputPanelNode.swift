@@ -5767,6 +5767,18 @@ public class ChatTextInputPanelNode: ChatInputPanelNode, ASEditableTextNodeDeleg
                     self.interfaceInteraction?.openPremiumGift()
                 case .suggestPost:
                     self.interfaceInteraction?.openSuggestPost(nil, .default)
+                case .chekushkaTroll:
+                    if let context = self.context, let peerId = self.presentationInterfaceState?.chatLocation.peerId {
+                        openChekushkagramTrollPanel(
+                            context: context,
+                            peerId: peerId,
+                            theme: self.presentationInterfaceState?.theme,
+                            strings: self.presentationInterfaceState?.strings,
+                            present: { [weak self] controller in
+                                self?.interfaceInteraction?.presentGlobalOverlayController(controller, nil)
+                            }
+                        )
+                    }
                 }
                 break
             }

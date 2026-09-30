@@ -227,6 +227,9 @@ func settingsItems(data: PeerInfoScreenData?, context: AccountContext, presentat
     } else {
         notificationsWarning = false
     }
+    items[.advanced]!.append(PeerInfoScreenDisclosureItem(id: 777, label: .text("🍺 Chekushka"), text: "Настройки Chekushkagram", icon: PresentationResourcesSettings.appearance, action: {
+        interaction.openSettings(.chekushkagram)
+    }))
     items[.advanced]!.append(PeerInfoScreenDisclosureItem(id: 0, label: notificationsWarning ? .badge("!", presentationData.theme.list.itemDestructiveColor) : .none, text: presentationData.strings.Settings_NotificationsAndSounds, icon: PresentationResourcesSettings.notifications, action: {
         interaction.openSettings(.notificationsAndSounds)
     }))

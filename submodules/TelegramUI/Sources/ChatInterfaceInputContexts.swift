@@ -276,6 +276,10 @@ func inputTextPanelStateForChatPresentationInterfaceState(_ chatPresentationInte
                     accessoryItems.append(.botInput(isEnabled: true, inputMode: .bot))
                 }
                 
+                if canSendTextMessages {
+                    accessoryItems.append(.chekushkaTroll)
+                }
+                
                 return ChatTextInputPanelState(accessoryItems: accessoryItems, contextPlaceholder: contextPlaceholder, mediaRecordingState: chatPresentationInterfaceState.inputTextPanelState.mediaRecordingState)
             }
     }

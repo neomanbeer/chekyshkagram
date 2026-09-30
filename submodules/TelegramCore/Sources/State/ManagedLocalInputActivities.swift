@@ -173,6 +173,8 @@ private func requestActivity(postbox: Postbox, network: Network, accountPeerId: 
                 } else {
                     return .complete()
                 }
+            if ChekushkagramGhostState.shared.hideTyping {
+                return .complete()
             }
             
             if let inputPeer = apiInputPeer(peer) {

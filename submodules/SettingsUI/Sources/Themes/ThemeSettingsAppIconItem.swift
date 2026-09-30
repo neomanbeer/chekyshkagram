@@ -377,36 +377,36 @@ class ThemeSettingsAppIconItemNode: ListViewItemNode, ItemListItemNode {
                             var bordered = true
                             switch icon.name {
                                 case "BlueIcon":
-                                    name = item.strings.Appearance_AppIconDefault
+                                    name = "Chekushka Classic"
                                 case "BlackIcon":
-                                    name = item.strings.Appearance_AppIconDefaultX
+                                    name = "Chekushka Noir"
                                 case "BlueClassicIcon":
-                                    name = item.strings.Appearance_AppIconClassic
+                                    name = "Chekushka Ice"
                                 case "BlackClassicIcon":
-                                    name = item.strings.Appearance_AppIconClassicX
+                                    name = "Chekushka Gold"
                                 case "BlueFilledIcon":
-                                    name = item.strings.Appearance_AppIconFilled
+                                    name = "Chekushka Cyber"
                                     bordered = false
                                 case "BlackFilledIcon":
-                                    name = item.strings.Appearance_AppIconFilledX
+                                    name = "Chekushka Dark"
                                     bordered = false
                                 case "WhiteFilled":
-                                    name = "⍺ White"
+                                    name = "Chekushka Light"
                                 case "New1":
-                                    name = item.strings.Appearance_AppIconNew1
+                                    name = "Chekushka Emerald"
                                 case "New2":
-                                    name = item.strings.Appearance_AppIconNew2
+                                    name = "Chekushka Sunset"
                                 case "Premium":
-                                    name = item.strings.Appearance_AppIconPremium
+                                    name = "Chekushka VIP"
                                 case "PremiumBlack":
-                                    name = item.strings.Appearance_AppIconBlack
+                                    name = "Chekushka Royal"
                                 case "PremiumTurbo":
-                                    name = item.strings.Appearance_AppIconTurbo
+                                    name = "Chekushka Turbo 40°"
                                 default:
                                     name = icon.name
                             }
                         
-                            imageNode.setup(theme: item.theme, icon: image, title: NSAttributedString(string: name, font: selected ? selectedTextFont : textFont, textColor: selected  ? item.theme.list.itemAccentColor : item.theme.list.itemPrimaryTextColor, paragraphAlignment: .center), locked: !item.isPremium && icon.isPremium, color: item.theme.list.itemPrimaryTextColor, bordered: bordered, selected: selected, action: {
+                            imageNode.setup(theme: item.theme, icon: image, title: NSAttributedString(string: name, font: selected ? selectedTextFont : textFont, textColor: selected  ? item.theme.list.itemAccentColor : item.theme.list.itemPrimaryTextColor, paragraphAlignment: .center), locked: false, color: item.theme.list.itemPrimaryTextColor, bordered: bordered, selected: selected, action: {
                                 item.updated(icon)
                             })
                         }

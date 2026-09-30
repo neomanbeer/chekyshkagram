@@ -38,7 +38,8 @@ func _internal_markMessageContentAsConsumedInteractively(postbox: Postbox, messa
                                 }
                             }
                         } else {
-                            addSynchronizeConsumeMessageContentsOperation(transaction: transaction, messageIds: [message.id])
+                            // Chekushkagram: Do not tell the server that view-once media was consumed
+                            // addSynchronizeConsumeMessageContentsOperation(transaction: transaction, messageIds: [message.id])
                         }
                     }
                 } else if let attribute = updatedAttributes[i] as? ConsumablePersonalMentionMessageAttribute, !attribute.consumed {
@@ -50,13 +51,10 @@ func _internal_markMessageContentAsConsumedInteractively(postbox: Postbox, messa
             let timestamp = Int32(CFAbsoluteTimeGetCurrent() + NSTimeIntervalSince1970)
             for i in 0 ..< updatedAttributes.count {
                 if let attribute = updatedAttributes[i] as? AutoremoveTimeoutMessageAttribute {
+                    // Chekushkagram: Keep view-once media forever without countdown
                     if attribute.countdownBeginTime == nil || attribute.countdownBeginTime == 0 {
-                        var timeout = attribute.timeout
-                        if let duration = message.secretMediaDuration {
-                            timeout = max(timeout, Int32(duration))
-                        }
-                        updatedAttributes[i] = AutoremoveTimeoutMessageAttribute(timeout: timeout, countdownBeginTime: timestamp)
-                        updateMessage = true
+                        // Keep countdownBeginTime nil so media is never auto-removed
+                    }
                         
                         if messageId.peerId.namespace == Namespaces.Peer.SecretChat {
                             var layer: SecretChatLayer?

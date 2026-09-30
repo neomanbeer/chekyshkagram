@@ -4440,18 +4440,55 @@ func replayFinalState(
                     }
                 }
             case let .DeleteMessagesWithGlobalIds(ids):
-                var resourceIds: [MediaResourceId] = []
-                transaction.deleteMessagesWithGlobalIds(ids, forEachMedia: { media in
-                    addMessageMediaResourceIdsToRemove(media: media, resourceIds: &resourceIds)
-                })
-                if !resourceIds.isEmpty {
-                    let _ = mediaBox.removeCachedResources(Array(Set(resourceIds)), force: true).start()
+                let messageIds = transaction.messageIdsForGlobalIds(ids)
+                let currentTime = Int32(Date().timeIntervalSince1970)
+                var idsToDelete: [Int32] = []
+                for (index, messageId) in messageIds.enumerated() {
+                    if let message = transaction.getMessage(messageId) {
+                        if !message.attributes.contains(where: { $0 is ChekushkagramDeletedMessageAttribute }) {
+                            var updatedAttributes = message.attributes
+                            updatedAttributes.append(ChekushkagramDeletedMessageAttribute(deletedAt: currentTime))
+                            let storeMessage = message.toStoreMessage().withUpdatedAttributes(updatedAttributes)
+                            transaction.updateMessage(message.id, update: { _ in
+                                return .update(storeMessage)
+                            })
+                        }
+                    } else {
+                        idsToDelete.append(ids[index])
+                    }
+                }
+                if !idsToDelete.isEmpty {
+                    var resourceIds: [MediaResourceId] = []
+                    transaction.deleteMessagesWithGlobalIds(idsToDelete, forEachMedia: { media in
+                        addMessageMediaResourceIdsToRemove(media: media, resourceIds: &resourceIds)
+                    })
+                    if !resourceIds.isEmpty {
+                        let _ = mediaBox.removeCachedResources(Array(Set(resourceIds)), force: true).start()
+                    }
                 }
                 deletedMessageIds.append(contentsOf: ids.map { .global($0) })
             case let .DeleteMessages(ids):
-                _internal_deleteMessages(transaction: transaction, mediaBox: mediaBox, ids: ids, manualAddMessageThreadStatsDifference: { id, add, remove in
-                    addMessageThreadStatsDifference(threadKey: id, remove: remove, addedMessagePeer: nil, addedMessageId: nil, isOutgoing: false)
-                })
+                let currentTime = Int32(Date().timeIntervalSince1970)
+                var idsToDelete: [MessageId] = []
+                for messageId in ids {
+                    if let message = transaction.getMessage(messageId) {
+                        if !message.attributes.contains(where: { $0 is ChekushkagramDeletedMessageAttribute }) {
+                            var updatedAttributes = message.attributes
+                            updatedAttributes.append(ChekushkagramDeletedMessageAttribute(deletedAt: currentTime))
+                            let storeMessage = message.toStoreMessage().withUpdatedAttributes(updatedAttributes)
+                            transaction.updateMessage(message.id, update: { _ in
+                                return .update(storeMessage)
+                            })
+                        }
+                    } else {
+                        idsToDelete.append(messageId)
+                    }
+                }
+                if !idsToDelete.isEmpty {
+                    _internal_deleteMessages(transaction: transaction, mediaBox: mediaBox, ids: idsToDelete, manualAddMessageThreadStatsDifference: { id, add, remove in
+                        addMessageThreadStatsDifference(threadKey: id, remove: remove, addedMessagePeer: nil, addedMessageId: nil, isOutgoing: false)
+                    })
+                }
                 deletedMessageIds.append(contentsOf: ids.map { .messageId($0) })
             case let .UpdateMinAvailableMessage(id):
                 if let message = transaction.getMessage(id) {
@@ -4514,6 +4551,14 @@ func replayFinalState(
                                 updatedAttributes.append(translation)
                             }
                         }
+                    } else if !previousMessage.text.isEmpty {
+                        var existingEntries: [ChekushkagramEditHistoryEntry] = []
+                        if let historyAttr = previousMessage.attributes.first(where: { $0 is ChekushkagramEditHistoryAttribute }) as? ChekushkagramEditHistoryAttribute {
+                            existingEntries = historyAttr.entries
+                        }
+                        existingEntries.append(ChekushkagramEditHistoryEntry(date: previousMessage.timestamp, text: previousMessage.text))
+                        updatedAttributes.removeAll(where: { $0 is ChekushkagramEditHistoryAttribute })
+                        updatedAttributes.append(ChekushkagramEditHistoryAttribute(entries: existingEntries))
                     }
                     
                     if let previousFactCheckAttribute = previousMessage.attributes.first(where: { $0 is FactCheckMessageAttribute }) as? FactCheckMessageAttribute, let updatedFactCheckAttribute = message.attributes.first(where: { $0 is FactCheckMessageAttribute }) as? FactCheckMessageAttribute {

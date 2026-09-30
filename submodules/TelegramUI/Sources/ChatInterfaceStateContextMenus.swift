@@ -1625,6 +1625,35 @@ func contextMenuForChatPresentationInterfaceState(chatPresentationInterfaceState
             })))
         }
         
+        let history = message.chekushkagramEditHistory
+        if !history.isEmpty {
+            actions.append(.action(ContextMenuActionItem(text: "История правок (\(history.count))", icon: { theme in
+                return generateTintedImage(image: UIImage(bundleImageName: "Chat/Context Menu/Edit"), color: theme.actionSheet.primaryTextColor)
+            }, action: { c, f in
+                f(.dismissWithoutContent)
+                var historyText = ""
+                let formatter = DateFormatter()
+                formatter.dateFormat = "HH:mm:ss dd.MM.yyyy"
+                for (idx, entry) in history.enumerated() {
+                    let dateStr = formatter.string(from: Date(timeIntervalSince1970: Double(entry.date)))
+                    historyText += "[\(idx + 1)] \(dateStr):\n\(entry.text)\n\n"
+                }
+                let controller = textAlertController(context: context, updatedPresentationData: nil, title: "История изменений Chekushkagram", text: historyText.trimmingCharacters(in: .whitespacesAndNewlines), actions: [TextAlertAction(type: .defaultAction, title: "OK", action: {})])
+                controllerInteraction.presentController(controller, nil)
+            })))
+        }
+        if message.isChekushkagramDeleted {
+            let deletedTime = message.chekushkagramDeletedTime ?? 0
+            let formatter = DateFormatter()
+            formatter.dateFormat = "HH:mm:ss dd.MM"
+            let dateStr = deletedTime > 0 ? formatter.string(from: Date(timeIntervalSince1970: Double(deletedTime))) : ""
+            actions.append(.action(ContextMenuActionItem(text: "Удалено \(dateStr) (Chekushkagram)", textColor: .destructive, icon: { theme in
+                return generateTintedImage(image: UIImage(bundleImageName: "Chat/Context Menu/Delete"), color: theme.actionSheet.destructiveColor)
+            }, action: { c, f in
+                f(.dismissWithoutContent)
+            })))
+        }
+        
         if let message = messages.first, message.id.namespace == Namespaces.Message.Cloud, let channel = message.peers[message.id.peerId] as? TelegramChannel, channel.isMonoForum {
             var canSuggestPost = true
             for media in message.media {
