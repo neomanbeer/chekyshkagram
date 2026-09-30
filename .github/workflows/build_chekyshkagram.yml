@@ -48,12 +48,12 @@ jobs:
           python3 build-system/Make/Make.py \
             --overrideXcodeVersion \
             --overrideBazelVersion \
+            --bazelArguments="--//Telegram:disableProvisioningProfiles --//Telegram:disableExtensions" \
             build \
             --configurationPath=build-system/template_minimal_development_configuration.json \
             --xcodeManagedCodesigning \
             --configuration=release_arm64 \
             --buildNumber=10001 \
-            --continueOnError \
             --outputBuildArtifactsPath=artifacts
 
       - name: Find and Package IPA
