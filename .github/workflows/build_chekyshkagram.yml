@@ -53,6 +53,7 @@ jobs:
             --xcodeManagedCodesigning \
             --configuration=release_arm64 \
             --buildNumber=10001 \
+            --continueOnError \
             --outputBuildArtifactsPath=artifacts
 
       - name: Find and Package IPA
