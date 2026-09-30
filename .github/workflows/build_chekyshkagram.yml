@@ -46,8 +46,9 @@ jobs:
       - name: Build Chekushkagram IPA
         run: |
           python3 build-system/Make/Make.py \
-            --configurationFilePath=build-system/template_minimal_development_configuration.json \
             build \
+            --configurationPath=build-system/template_minimal_development_configuration.json \
+            --codesigningInformationPath=build-system/fake-codesigning \
             --configuration=release_arm64 \
             --buildNumber=10001 \
             --outputBuildArtifactsPath=artifacts
