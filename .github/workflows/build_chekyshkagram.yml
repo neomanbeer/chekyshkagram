@@ -50,7 +50,7 @@ jobs:
             --overrideBazelVersion \
             build \
             --configurationPath=build-system/template_minimal_development_configuration.json \
-            --codesigningInformationPath=build-system/fake-codesigning \
+            --xcodeManagedCodesigning \
             --configuration=release_arm64 \
             --buildNumber=10001 \
             --outputBuildArtifactsPath=artifacts
