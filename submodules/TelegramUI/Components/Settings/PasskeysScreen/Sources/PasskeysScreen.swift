@@ -203,7 +203,7 @@ final class PasskeysScreenComponent: Component {
             guard let component = self.component else {
                 return
             }
-            guard let passkey = self.passkeysData?.first(where: { $0.id == id }) else {
+            guard self.passkeysData?.contains(where: { $0.id == id }) == true else {
                 return
             }
             let _ = component.context.engine.auth.deletePasskey(id: id).startStandalone()
