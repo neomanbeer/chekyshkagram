@@ -507,21 +507,17 @@ func initializedNetwork(accountId: AccountRecordId, arguments: NetworkInitializa
             
             let context = MTContext(serialization: serialization, encryptionProvider: arguments.encryptionProvider, apiEnvironment: apiEnvironment, isTestingEnvironment: testingEnvironment, useTempAuthKeys: useTempAuthKeys)
             
-            if let networkSettings = networkSettings {
+            if #available(iOS 12.0, macOS 14.0, *) {
                 let useNetworkFramework: Bool
-                if let customValue = networkSettings.useNetworkFramework {
+                if let customValue = networkSettings?.useNetworkFramework {
                     useNetworkFramework = customValue
-                } else if arguments.useBetaFeatures {
-                    useNetworkFramework = true
                 } else {
-                    useNetworkFramework = false
+                    useNetworkFramework = true
                 }
                 
                 if useNetworkFramework {
-                    if #available(iOS 12.0, macOS 14.0, *) {
-                        context.makeTcpConnectionInterface = { delegate, delegateQueue in
-                            return NetworkFrameworkTcpConnectionInterface(delegate: delegate, delegateQueue: delegateQueue)
-                        }
+                    context.makeTcpConnectionInterface = { delegate, delegateQueue in
+                        return NetworkFrameworkTcpConnectionInterface(delegate: delegate, delegateQueue: delegateQueue)
                     }
                 }
             }
@@ -536,16 +532,22 @@ func initializedNetwork(accountId: AccountRecordId, arguments: NetworkInitializa
                 ]
             } else {
                 seedAddressList = [
-                    1: ["149.154.175.50", "2001:b28:f23d:f001::a"],
-                    2: ["149.154.167.50", "95.161.76.100", "2001:67c:4e8:f002::a"],
+                    1: ["149.154.175.50", "149.154.175.53", "2001:b28:f23d:f001::a"],
+                    2: ["149.154.167.50", "149.154.167.51", "95.161.76.100", "91.108.56.165", "2001:67c:4e8:f002::a"],
                     3: ["149.154.175.100", "2001:b28:f23d:f003::a"],
-                    4: ["149.154.167.91", "2001:67c:4e8:f004::a"],
-                    5: ["149.154.171.5", "2001:b28:f23f:f005::a"]
+                    4: ["149.154.167.91", "149.154.167.92", "2001:67c:4e8:f004::a"],
+                    5: ["149.154.171.5", "91.108.56.190", "2001:b28:f23f:f005::a"]
                 ]
             }
             
             for (id, ips) in seedAddressList {
-                context.setSeedAddressSetForDatacenterWithId(id, seedAddressSet: MTDatacenterAddressSet(addressList: ips.map { MTDatacenterAddress(ip: $0, port: 443, preferForMedia: false, restrictToTcp: false, cdn: false, preferForProxy: false, secret: nil) }))
+                var addressList: [MTDatacenterAddress] = []
+                for ip in ips {
+                    for port in [443, 80, 5222, 8443] as [UInt16] {
+                        addressList.append(MTDatacenterAddress(ip: ip, port: port, preferForMedia: false, restrictToTcp: false, cdn: false, preferForProxy: false, secret: nil))
+                    }
+                }
+                context.setSeedAddressSetForDatacenterWithId(id, seedAddressSet: MTDatacenterAddressSet(addressList: addressList))
             }
             
             context.keychain = keychain
