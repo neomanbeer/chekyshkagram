@@ -486,6 +486,7 @@ public class AttachmentController: ViewController, MinimizableController {
         private let bottomPanelBackgroundColorDisposable = MetaDisposable()
 
         private var selectionCount: Int = 0
+        private var currentCaption: NSAttributedString?
 
         var mediaPickerContext: AttachmentMediaPickerContext? {
             didSet {
@@ -493,6 +494,7 @@ public class AttachmentController: ViewController, MinimizableController {
                     self.captionDisposable.set((mediaPickerContext.caption
                     |> deliverOnMainQueue).startStrict(next: { [weak self] caption in
                         if let strongSelf = self {
+                            strongSelf.currentCaption = caption
                             strongSelf.panel.updateCaption(caption ?? NSAttributedString())
                         }
                     }))
@@ -765,21 +767,23 @@ public class AttachmentController: ViewController, MinimizableController {
                 }
             }
             self.panel.invokeAICompose = { [weak self] in
-                Task { @MainActor in
-                    guard let self, let controller = self.controller, let mediaPickerContext = self.mediaPickerContext else {
-                        return
-                    }
+                guard let self, let controller = self.controller, let mediaPickerContext = self.mediaPickerContext else {
+                    return
+                }
+                let captionText = (self.currentCaption ?? self.panel.presentationInterfaceState.interfaceState.effectiveInputState.inputText)?.string ?? ""
+                if captionText.isEmpty {
+                    return
+                }
+                let theme = self.presentationData.theme
 
-                    guard let caption = await mediaPickerContext.caption.get() else {
-                        return
-                    }
-                    if caption.length == 0 {
+                Task { @MainActor [weak self] in
+                    guard let self else {
                         return
                     }
 
                     let textProcessingScreen = await controller.context.sharedContext.makeTextProcessingScreen(
                         context: controller.context,
-                        theme: self.presentationData.theme,
+                        theme: theme,
                         mode: .edit(
                             saveRestoreStateId: nil,
                             completion: { [weak self] text in
@@ -806,7 +810,7 @@ public class AttachmentController: ViewController, MinimizableController {
                             },
                             sendContextActions: nil
                         ),
-                        inputText: .plain(text: caption.string, entities: []),
+                        inputText: .plain(text: captionText, entities: []),
                         copyResult: nil,
                         translateChat: nil
                     )
