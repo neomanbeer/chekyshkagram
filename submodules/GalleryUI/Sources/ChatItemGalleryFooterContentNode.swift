@@ -542,6 +542,7 @@ final class ChatItemGalleryFooterContentNode: GalleryFooterContentNode, ASScroll
                     if case let .channel(channel) = peer, !(channel.addressName ?? "").isEmpty {
                         showTranslateIfTopical = true
                     }*/
+                    let showTranslateIfTopical = false
                     let plainText = text.string
                     let (_, language) = canTranslateText(context: self.context, text: plainText, showTranslate: translationSettings.showTranslate, showTranslateIfTopical: showTranslateIfTopical, ignoredLanguages: translationSettings.ignoredLanguages)
                     
@@ -589,7 +590,7 @@ final class ChatItemGalleryFooterContentNode: GalleryFooterContentNode, ASScroll
         })
         
         textSelectionNode.enableLookup = true
-        textSelectionNode.canBeginSelection = { [weak self] location in
+        textSelectionNode.canBeginSelection = { [weak self] (location: CGPoint) -> Bool in
             guard let self else {
                 return false
             }
