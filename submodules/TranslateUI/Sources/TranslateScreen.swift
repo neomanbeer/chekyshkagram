@@ -24,8 +24,8 @@ public func presentTranslateScreen(
     wasDismissed: (() -> Void)? = nil,
     display: (ViewController) -> Void
 ) {
-    let translationConfiguration = TranslationConfiguration.with(appConfiguration: context.currentAppConfiguration.with { $0 })
     #if compiler(>=6.0)
+    let translationConfiguration = TranslationConfiguration.with(appConfiguration: context.currentAppConfiguration.with { $0 })
     var useSystemTranslation = false
     switch translationConfiguration.manual {
     case .system:
