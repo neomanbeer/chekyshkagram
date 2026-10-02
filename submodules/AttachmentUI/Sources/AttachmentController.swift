@@ -748,6 +748,7 @@ public class AttachmentController: ViewController, MinimizableController {
 
             self.panel.textUpdated = { [weak self] text in
                 if let strongSelf = self {
+                    strongSelf.currentCaption = text
                     strongSelf.mediaPickerContext?.setCaption(text)
                 }
             }
@@ -770,7 +771,7 @@ public class AttachmentController: ViewController, MinimizableController {
                 guard let self, let controller = self.controller, let mediaPickerContext = self.mediaPickerContext else {
                     return
                 }
-                let captionText = (self.currentCaption ?? self.panel.presentationInterfaceState.interfaceState.effectiveInputState.inputText)?.string ?? ""
+                let captionText = self.currentCaption?.string ?? ""
                 if captionText.isEmpty {
                     return
                 }
