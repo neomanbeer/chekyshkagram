@@ -60,14 +60,15 @@ jobs:
           python3 build-system/Make/Make.py \
             --overrideXcodeVersion \
             --overrideBazelVersion \
+            --cacheDir=/Users/runner/bazel-disk-cache \
             build \
             --configurationPath=build-system/template_minimal_development_configuration.json \
             --xcodeManagedCodesigning \
             --disableProvisioningProfiles \
             --disableExtensions \
             --configuration=release_arm64 \
+            --enableParallelSwiftmoduleGeneration \
             --buildNumber=10001 \
-            --cacheDir=/Users/runner/bazel-disk-cache \
             --outputBuildArtifactsPath=artifacts
 
       - name: Find and Package IPA
