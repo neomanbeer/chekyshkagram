@@ -46,8 +46,17 @@ jobs:
           python3 -c "p = 'build-system/bazel-rules/rules_apple/apple/internal/partials/provisioning_profile.bzl'; c = open(p).read(); open(p, 'w').write(c.replace('if not profile_artifact:\n        fail(', 'if not profile_artifact:\n        return struct()\n        fail('))"
           python3 -c "p = 'build-system/bazel-rules/rules_apple/apple/internal/codesigning_support.bzl'; c = open(p).read(); open(p, 'w').write(c.replace('rule_descriptor.requires_signing_for_device and\n        not provisioning_profile):\n        fail(', 'rule_descriptor.requires_signing_for_device and\n        not provisioning_profile):\n        return\n        fail('))"
 
+      - name: Cache Bazel
+        uses: actions/cache@v4
+        with:
+          path: /Users/runner/bazel-disk-cache
+          key: bazel-cache-${{ runner.os }}-xcode15.4-${{ github.ref }}
+          restore-keys: |
+            bazel-cache-${{ runner.os }}-xcode15.4-
+
       - name: Build Chekushkagram IPA
         run: |
+          mkdir -p /Users/runner/bazel-disk-cache
           python3 build-system/Make/Make.py \
             --overrideXcodeVersion \
             --overrideBazelVersion \
@@ -58,6 +67,7 @@ jobs:
             --disableExtensions \
             --configuration=release_arm64 \
             --buildNumber=10001 \
+            --cacheDir=/Users/runner/bazel-disk-cache \
             --outputBuildArtifactsPath=artifacts
 
       - name: Find and Package IPA

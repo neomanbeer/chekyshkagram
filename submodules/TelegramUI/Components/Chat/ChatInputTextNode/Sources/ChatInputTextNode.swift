@@ -1109,8 +1109,8 @@ public final class ChatInputTextView: ChatInputTextViewImpl, UITextViewDelegate,
         self.delegate = self
         self.scrollsToTop = false
         
-        if #available(iOS 18.0, *) {
-            self.supportsAdaptiveImageGlyph = false
+        if self.responds(to: NSSelectorFromString("setSupportsAdaptiveImageGlyph:")) {
+            self.setValue(false, forKey: "supportsAdaptiveImageGlyph")
         }
         
         self.displayInternal.updateDisplayElements = { [weak self] in

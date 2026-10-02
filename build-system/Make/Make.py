@@ -185,12 +185,6 @@ class BazelCommandLine:
 
                 # Always build universal Watch binaries.
                 '--watchos_cpus=arm64_32',
-
-                # Generate DSYM files when building.
-                '--apple_generate_dsym',
-
-                # Require DSYM files as build output.
-                '--output_groups=+dsyms',
             ] + self.common_release_args
         else:
             raise Exception('Unknown configuration {}'.format(configuration))
@@ -731,18 +725,19 @@ def build(bazel, arguments):
         shutil.copyfile(ipa_paths[0], artifacts_path + '/Telegram.ipa')
 
         dsym_paths = glob.glob('bazel-bin/Telegram/*.dSYM')
-        for dsym_path in dsym_paths:
-            file_name = os.path.basename(dsym_path)
-            shutil.copytree(dsym_path, artifacts_path + '/DSYMs/{}'.format(file_name))
-        previous_directory = os.getcwd()
-        os.chdir(artifacts_path)
-        run_executable_with_output('zip', arguments=[
-            '-r',
-            'Telegram.DSYMs.zip',
-            './DSYMs'
-        ], check_result=True)
-        os.chdir(previous_directory)
-        shutil.rmtree(artifacts_path + '/DSYMs')
+        if dsym_paths:
+            for dsym_path in dsym_paths:
+                file_name = os.path.basename(dsym_path)
+                shutil.copytree(dsym_path, artifacts_path + '/DSYMs/{}'.format(file_name))
+            previous_directory = os.getcwd()
+            os.chdir(artifacts_path)
+            run_executable_with_output('zip', arguments=[
+                '-r',
+                'Telegram.DSYMs.zip',
+                './DSYMs'
+            ], check_result=True)
+            os.chdir(previous_directory)
+            shutil.rmtree(artifacts_path + '/DSYMs')
 
 
 def test(bazel, arguments):
