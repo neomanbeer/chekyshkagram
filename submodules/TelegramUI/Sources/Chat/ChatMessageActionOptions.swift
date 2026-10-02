@@ -634,7 +634,7 @@ func presentChatReplyOptions(selfController: ChatControllerImpl, sourceView: UIV
 
 func moveReplyMessageToAnotherChat(selfController: ChatControllerImpl, replySubject: ChatInterfaceState.ReplyMessageSubject) {
     let _ = selfController.presentVoiceMessageDiscardAlert(action: { [weak selfController] in
-        Task { @MainActor in
+        Task { @MainActor [weak selfController] in
             guard let selfController else {
                 return
             }
