@@ -390,7 +390,7 @@ public func chekushkagramSettingsController(context: AccountContext) -> ViewCont
             pushControllerImpl?(themeSettingsController(context: context))
         },
         openAppIconSettings: {
-            pushControllerImpl?(themeSettingsController(context: context, focusOnItemTag: .appIcon))
+            pushControllerImpl?(themeSettingsController(context: context, focusOnItemTag: ThemeSettingsEntryTag.icon))
         },
         resetTrollTemplates: {
             let _ = updateChekushkagramSettingsInteractively(accountManager: context.sharedContext.accountManager, { current in
