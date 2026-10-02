@@ -542,9 +542,8 @@ final class ChatItemGalleryFooterContentNode: GalleryFooterContentNode, ASScroll
                     if case let .channel(channel) = peer, !(channel.addressName ?? "").isEmpty {
                         showTranslateIfTopical = true
                     }*/
-                    let showTranslateIfTopical = false
-                    
-                    let (_, language) = canTranslateText(context: self.context, text: text.string, showTranslate: translationSettings.showTranslate, showTranslateIfTopical: showTranslateIfTopical, ignoredLanguages: translationSettings.ignoredLanguages)
+                    let plainText = text.string
+                    let (_, language) = canTranslateText(context: self.context, text: plainText, showTranslate: translationSettings.showTranslate, showTranslateIfTopical: showTranslateIfTopical, ignoredLanguages: translationSettings.ignoredLanguages)
                     
                     let _ = ApplicationSpecificNotice.incrementTranslationSuggestion(accountManager: self.context.sharedContext.accountManager, timestamp: Int32(Date().timeIntervalSince1970)).start()
 
@@ -556,7 +555,7 @@ final class ChatItemGalleryFooterContentNode: GalleryFooterContentNode, ASScroll
                             context: self.context,
                             theme: defaultDarkPresentationTheme,
                             mode: .translate(fromLanguage: language, applyResult: nil),
-                            inputText: .plain(text: text.string, entities: []),
+                            inputText: .plain(text: plainText, entities: []),
                             copyResult: { [weak self] text in
                                 guard let self else {
                                     return
