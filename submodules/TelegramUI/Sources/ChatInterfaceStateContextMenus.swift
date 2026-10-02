@@ -1648,7 +1648,7 @@ func contextMenuForChatPresentationInterfaceState(chatPresentationInterfaceState
             formatter.dateFormat = "HH:mm:ss dd.MM"
             let dateStr = deletedTime > 0 ? formatter.string(from: Date(timeIntervalSince1970: Double(deletedTime))) : ""
             actions.append(.action(ContextMenuActionItem(text: "Удалено \(dateStr) (Chekushkagram)", textColor: .destructive, icon: { theme in
-                return generateTintedImage(image: UIImage(bundleImageName: "Chat/Context Menu/Delete"), color: theme.actionSheet.destructiveColor)
+                return generateTintedImage(image: UIImage(bundleImageName: "Chat/Context Menu/Delete"), color: theme.contextMenu.destructiveColor)
             }, action: { c, f in
                 f(.dismissWithoutContent)
             })))
