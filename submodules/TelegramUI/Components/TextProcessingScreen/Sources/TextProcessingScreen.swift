@@ -1789,8 +1789,10 @@ private final class TextProcessingSheetComponent: Component {
                                             guard let self else {
                                                 return
                                             }
-                                            self.styleCreatedToastData = nil
-                                            self.state?.updated(transition: .spring(duration: 0.4))
+                                            Task { @MainActor [weak self] in
+                                                self?.styleCreatedToastData = nil
+                                                self?.state?.updated(transition: .spring(duration: 0.4))
+                                            }
                                         }), emojiFile, style)
                                     }
                                 }
@@ -1832,11 +1834,13 @@ private final class TextProcessingSheetComponent: Component {
                                 return
                             }
                             self.customToastData = (Foundation.Timer.scheduledTimer(withTimeInterval: 5.0, repeats: false, block: { [weak self] _ in
-                                guard let self else {
-                                    return
+                                Task { @MainActor [weak self] in
+                                    guard let self else {
+                                        return
+                                    }
+                                    self.customToastData = nil
+                                    self.state?.updated(transition: .spring(duration: 0.4))
                                 }
-                                self.customToastData = nil
-                                self.state?.updated(transition: .spring(duration: 0.4))
                             }), text)
                             self.state?.updated(transition: .spring(duration: 0.4))
                         },
