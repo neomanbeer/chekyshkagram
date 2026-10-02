@@ -25,26 +25,25 @@ public func presentTranslateScreen(
     display: (ViewController) -> Void
 ) {
     let translationConfiguration = TranslationConfiguration.with(appConfiguration: context.currentAppConfiguration.with { $0 })
+    #if compiler(>=6.0)
     var useSystemTranslation = false
     switch translationConfiguration.manual {
     case .system:
-        #if compiler(>=6.0)
         if #available(iOS 18.0, *) {
             useSystemTranslation = true
         }
-        #endif
     default:
         break
     }
     
     if useSystemTranslation {
         presentSystemTranslateScreen(context: context, text: text)
-    } else {
     }
+    #endif
 }
 
+#if compiler(>=6.0)
 private func presentSystemTranslateScreen(context: AccountContext, text: String) {
-    #if compiler(>=6.0)
     if #available(iOS 18.0, *), let rootViewController = context.sharedContext.mainWindow?.viewController?.view.window?.rootViewController {
         var dismissImpl: (() -> Void)?
         let pickerView = TranslateScreenHostingView(text: text, completionHandler: { [weak rootViewController] in
@@ -63,8 +62,8 @@ private func presentSystemTranslateScreen(context: AccountContext, text: String)
             })
         }
     }
-    #endif
 }
+#endif
 
 #if compiler(>=6.0)
 @available(iOS 18.0, *)
