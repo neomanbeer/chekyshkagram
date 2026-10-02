@@ -70,6 +70,7 @@ extension DocumentCanvasView {
     }
 
     func presentTranslate() {
+        #if compiler(>=6.0)
         guard #available(iOS 17.4, *) else { return }
         guard let term = selectedPlainText(), let vc = owningViewController() else { return }
         weak var host: UIViewController?
@@ -79,6 +80,7 @@ extension DocumentCanvasView {
         // The host is invisible; the inner system translate sheet provides its own animation.
         hc.modalPresentationStyle = .overCurrentContext
         vc.present(hc, animated: false)
+        #endif
     }
 
     func presentShare() {
@@ -96,6 +98,7 @@ extension DocumentCanvasView {
 /// calls `onClose` when the sheet closes so its UIKit hosting controller can be torn down explicitly
 /// (relying on @Environment(\.dismiss) for a UIKit-presented host is not guaranteed). The public
 /// Translate API is SwiftUI-only.
+#if compiler(>=6.0)
 @available(iOS 17.4, *)
 private struct TranslatePresenter: View {
     let text: String
@@ -107,4 +110,5 @@ private struct TranslatePresenter: View {
             .onChange(of: isPresented) { _, shown in if !shown { onClose() } }
     }
 }
+#endif
 #endif
