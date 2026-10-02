@@ -2,6 +2,7 @@ import Foundation
 import UIKit
 import AsyncDisplayKit
 import Display
+import Postbox
 import TelegramCore
 import TelegramPresentationData
 import AccountContext
@@ -15,7 +16,7 @@ public final class ChekushkagramRaidManager {
     private(set) public var currentCount: Int = 0
     private(set) public var totalCount: Int = 0
     private(set) public var currentPhrases: [String] = []
-    private(set) public var currentPeerId: PeerId?
+    private(set) public var currentPeerId: EnginePeer.Id?
     
     public var onProgressUpdate: ((Int, Int) -> Void)?
     
@@ -23,7 +24,7 @@ public final class ChekushkagramRaidManager {
     
     public func startRaid(
         account: Account,
-        peerId: PeerId,
+        peerId: EnginePeer.Id,
         phrases: [String],
         count: Int,
         interval: Double,
@@ -111,7 +112,7 @@ public enum ChekushkagramTextMutator {
 
 public func openChekushkagramTrollPanel(
     context: AccountContext,
-    peerId: PeerId,
+    peerId: EnginePeer.Id,
     theme: PresentationTheme?,
     strings: PresentationStrings?,
     present: @escaping (ViewController) -> Void
