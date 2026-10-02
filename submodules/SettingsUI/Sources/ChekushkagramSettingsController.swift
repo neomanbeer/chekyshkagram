@@ -289,8 +289,6 @@ private func chekushkagramSettingsEntries(presentationData: PresentationData, se
 }
 
 public func chekushkagramSettingsController(context: AccountContext) -> ViewController {
-    let presentationData = context.sharedContext.currentPresentationData.with { $0 }
-    
     var pushControllerImpl: ((ViewController) -> Void)?
     
     let arguments = ChekushkagramSettingsArguments(
