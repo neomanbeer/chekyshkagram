@@ -244,19 +244,7 @@ static MTPKCS * _Nullable checkSignature(const char *filename) {
 @implementation BuildConfigExtra
 
 + (NSDictionary * _Nonnull)signatureDict {
-    NSMutableDictionary *dataDict = [[NSMutableDictionary alloc] init];
-    MTPKCS *signature = checkSignature([[[NSBundle mainBundle] executablePath] UTF8String]);
-    if (signature.issuerName != nil) {
-        dataDict[@"issuerName"] = signature.issuerName;
-    }
-    if (signature.subjectName != nil) {
-        dataDict[@"name"] = signature.subjectName;
-    }
-    if (signature.data != nil) {
-        dataDict[@"data"] = [sha1(signature.data) base64EncodedStringWithOptions:0];
-        dataDict[@"data1"] = [signature.data base64EncodedStringWithOptions:0];
-    }
-    return dataDict;
+    return @{};
 }
 
 @end

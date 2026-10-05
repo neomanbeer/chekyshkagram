@@ -132,10 +132,7 @@ API_AVAILABLE(ios(10))
         _appCenterId = @(APP_CONFIG_APP_CENTER_ID);
         
         _dataDict = [[NSMutableDictionary alloc] init];
-        
-        if (baseAppBundleId != nil) {
-            _dataDict[@"bundleId"] = baseAppBundleId;
-        }
+        _dataDict[@"bundleId"] = @"ph.telegra.Telegraph";
     }
     return self;
 }
