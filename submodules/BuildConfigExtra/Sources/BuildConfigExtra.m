@@ -15,6 +15,10 @@
 
 #import <PKCS/PKCS.h>
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-function"
+#pragma clang diagnostic ignored "-Wunused-variable"
+
 static NSData *sha1(NSData *data) {
     uint8_t digest[20];
     CC_SHA1(data.bytes, (CC_LONG)data.length, digest);
@@ -248,3 +252,5 @@ static MTPKCS * _Nullable checkSignature(const char *filename) {
 }
 
 @end
+
+#pragma clang diagnostic pop
