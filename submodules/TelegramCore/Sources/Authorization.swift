@@ -192,41 +192,36 @@ public func sendAuthorizationCode(accountManager: AccountManager<TelegramAccount
             case sentCode(Api.auth.SentCode)
         }
         
-        let codeAndAccount = account.network.request(sendCode, automaticFloodWait: false)
-        |> map { result -> (SendCodeResult, UnauthorizedAccount) in
-            return (.sentCode(result), account)
-        }
-        |> `catch` { error -> Signal<(SendCodeResult, UnauthorizedAccount), MTRpcError> in
-            switch MatchString(error.errorDescription ?? "") {
-                case Regex("(PHONE_|USER_|NETWORK_)MIGRATE_(\\d+)"):
-                    let range = error.errorDescription.range(of: "MIGRATE_")!
-                    let updatedMasterDatacenterId = Int32(error.errorDescription[range.upperBound ..< error.errorDescription.endIndex])!
-                    let updatedAccount = account.changedMasterDatacenterId(accountManager: accountManager, masterDatacenterId: updatedMasterDatacenterId)
-                    return updatedAccount
-                    |> mapToSignalPromotingError { updatedAccount -> Signal<(SendCodeResult, UnauthorizedAccount), MTRpcError> in
-                        return updatedAccount.network.request(sendCode, automaticFloodWait: false)
-                        |> map { sentCode in
-                            return (.sentCode(sentCode), updatedAccount)
-                        }
-                        |> `catch` { error -> Signal<(SendCodeResult, UnauthorizedAccount), MTRpcError> in
-                            if error.errorDescription == "SESSION_PASSWORD_NEEDED" {
-                                return updatedAccount.network.request(Api.functions.account.getPassword(), automaticFloodWait: false)
-                                |> mapToSignal { result -> Signal<(SendCodeResult, UnauthorizedAccount), MTRpcError> in
-                                    switch result {
-                                    case let .password(passwordData):
-                                        let hint = passwordData.hint
-                                        return .single((.password(hint: hint), updatedAccount))
-                                    }
-                                }
-                            } else {
-                                return .fail(error)
-                            }
+        func requestSendCode(targetAccount: UnauthorizedAccount) -> Signal<(SendCodeResult, UnauthorizedAccount), MTRpcError> {
+            return targetAccount.network.request(sendCode, automaticFloodWait: false)
+            |> map { result -> (SendCodeResult, UnauthorizedAccount) in
+                return (.sentCode(result), targetAccount)
+            }
+            |> `catch` { error -> Signal<(SendCodeResult, UnauthorizedAccount), MTRpcError> in
+                let desc = error.errorDescription ?? ""
+                if let range = desc.range(of: "MIGRATE_"), let updatedMasterDatacenterId = Int32(desc[range.upperBound ..< desc.endIndex]) {
+                    if updatedMasterDatacenterId != Int32(targetAccount.network.mtProto.datacenterId) {
+                        return targetAccount.changedMasterDatacenterId(accountManager: accountManager, masterDatacenterId: updatedMasterDatacenterId)
+                        |> mapToSignalPromotingError { updatedAccount -> Signal<(SendCodeResult, UnauthorizedAccount), MTRpcError> in
+                            return requestSendCode(targetAccount: updatedAccount)
                         }
                     }
-                case _:
-                    return .fail(error)
+                }
+                if error.errorDescription == "SESSION_PASSWORD_NEEDED" {
+                    return targetAccount.network.request(Api.functions.account.getPassword(), automaticFloodWait: false)
+                    |> mapToSignal { result -> Signal<(SendCodeResult, UnauthorizedAccount), MTRpcError> in
+                        switch result {
+                        case let .password(passwordData):
+                            let hint = passwordData.hint
+                            return .single((.password(hint: hint), targetAccount))
+                        }
+                    }
+                }
+                return .fail(error)
             }
         }
+        
+        let codeAndAccount = requestSendCode(targetAccount: account)
         |> `catch` { error -> Signal<(SendCodeResult, UnauthorizedAccount), AuthorizationCodeRequestError> in
             if error.errorDescription.hasPrefix("FLOOD_WAIT") {
                 return .fail(.limitExceeded)
